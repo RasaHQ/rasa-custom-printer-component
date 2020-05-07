@@ -3,6 +3,8 @@
   - utter_proglang
 
 ## say goodbye
+* bot_challenge
+  - utter_i_am_bot
 * goodbye
   - utter_goodbye
 

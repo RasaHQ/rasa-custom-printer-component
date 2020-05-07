@@ -1,7 +1,6 @@
 import typing
 from typing import Any, Optional, Text, Dict, List, Type
 
-import click
 from rasa.nlu.components import Component
 from rasa.nlu.config import RasaNLUModelConfig
 from rasa.nlu.training_data import Message, TrainingData
@@ -19,7 +18,7 @@ def _is_list_tokens(v):
     return False
 
 
-class Pinter(Component):
+class Printer(Component):
     """A new component"""
 
     @classmethod

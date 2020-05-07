@@ -1,6 +1,7 @@
 actions:
 - utter_proglang
 - utter_goodbye
+- utter_i_am_bot
 - utter_greet
 entities:
 - proglang
@@ -8,7 +9,10 @@ intents:
 - talk_code
 - greet
 - goodbye
+- bot_challenge
 responses:
+  utter_i_am_bot:
+    - text: I am not a human. I am a chatbot made by Rasa.
   utter_proglang:
     - text: You want to talk about code.
   utter_goodbye:
