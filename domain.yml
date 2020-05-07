@@ -1,5 +1,5 @@
 actions:
-- action_proglang
+- utter_proglang
 - utter_goodbye
 - utter_greet
 entities:
@@ -9,10 +9,12 @@ intents:
 - greet
 - goodbye
 responses:
+  utter_proglang:
+    - text: You want to talk about code.
   utter_goodbye:
-  - text: Bye
+    - text: Bye
   utter_greet:
-  - text: Hey! How are you?
+    - text: Hey! How are you?
 session_config:
   carry_over_slots_to_new_session: true
   session_expiration_time: 60

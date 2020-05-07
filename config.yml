@@ -2,17 +2,24 @@ language: en
 
 pipeline:
 - name: WhitespaceTokenizer
+- name: printer.Printer
+  alias: after tokenizer
 - name: CountVectorsFeaturizer
-- name: debugger.Debugger
-  prefix: LOGGING READY
-  color: green
+- name: printer.Printer
+  alias: after 1st cv
 - name: CountVectorsFeaturizer
   analyzer: char_wb
   min_ngram: 1
   max_ngram: 4
-- name: debugger.Debugger
+- name: printer.Printer
+  alias: after 2nd cv
+- name: LexicalSyntacticFeaturizer
+- name: printer.Printer
+  alias: after lexical syntactic featurizer
 - name: DIETClassifier
   epochs: 20
+- name: printer.Printer
+  alias: after diet classifier
 policies:
   - name: MemoizationPolicy
   - name: TEDPolicy

@@ -1,6 +1,6 @@
 ## just code
 * talk_code
-  - action_proglang
+  - utter_proglang
 
 ## say goodbye
 * goodbye
@@ -10,4 +10,4 @@
 * greet
     - utter_greet
 * talk_code{"proglang": "python"}
-    - action_proglang
+    - utter_proglang
