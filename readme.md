@@ -365,3 +365,10 @@ So what have we seen in this guide?
 - We've seen what features the component receives by looking at the output from the `printer.Printer`.
 - We've seen that the Rasa components continously add information to the message that is passed. 
 
+You may want to think twice about using this in production though. The `printer.Printer` 
+is great when you're writing custom components because you can see the effects on the messages 
+but every time you add a `printer.Printer` to the pipeline you'll need to call `rasa train` to
+see the effects. All the print statements might also cause an overflow of logs to appear so 
+it's best to keep this component for local development. 
+
+We will use the component in other blogposts in this series, so keep an eye on the blog for that. 
