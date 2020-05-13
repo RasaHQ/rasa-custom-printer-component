@@ -18,9 +18,9 @@ introduction on how to create custom components.
 ## Example Project
 
 You can clone the repository found [here]() if you'd like to be able
-to run the same project. The project is relatively simple; we're only
-dealing with four intents and one entity. Here's some of the project
-files. 
+to run the same project. The repository contains a relatively small 
+rasa project; we're only dealing with four intents and one entity. 
+Here's some of the files in the project:
 
 ### `data/nlu.md`
 
@@ -66,10 +66,8 @@ files.
     - utter_proglang
 ```
 
-These files on their own don't do much but once we call `rasa train` on 
-the command line these files will generate training data for our machine
-learning pipeline. You can the definition of this pipeline in the `config.yml`
-file.
+Once we call `rasa train` on the command line these files will generate training data for our machine
+learning pipeline. You can see the definition of this pipeline in the `config.yml` file.
 
 ## `config.yml`
 
@@ -94,12 +92,11 @@ policies:
 
 ## Printing Context 
 
-The pipeline that we use here might remind you of scikit-learn but you
-need to be careful. The Rasa pipeline is different. Scikit-learn will
-replace information when it leaves a pipeline step while Rasa will 
-add information. 
+The schematic below shows the lifecycle of components in Rasa.
 
-Let's make our own component to make it clear. The 
+![](https://blog.rasa.com/content/images/2019/02/Rasa-Component-Lifecycle--Train-.png)
+
+Let's make our own component to make it explicit what data gets created. The 
 goal of the component will be to print all available information known
 at a certain point in the pipeline. This way, our new pipeline may
 look something like this; 
@@ -138,9 +135,9 @@ policies:
 Let's note a few things. 
 
 1. We've added new steps that have the name `printer.Printer`. This is a custom component that we'll need to create. 
-2. We've placed the `printer.Printer` component after each featurization step. By doing this we might see the effect that these all have.
+2. We've placed the `printer.Printer` component after each featurization step. The goal is that this component prints what information is created in each step.
 3. We've also placed the `printer.Printer` component after the `DIETClassifier` step. This should allow us to directly see the model output.
-4. The custom component takes an argument `alias` that allows us to give it an extra name. This is useful because it allows us add a name to the logs that we will print.
+4. The custom component takes an argument `alias` that allows us to give it an extra name. This means that the component that we'll create needs to be able to read in parameters passed in `config.yml`.
 
 ## Making the `printer.Printer` Component
 
@@ -166,6 +163,11 @@ if typing.TYPE_CHECKING:
 
 
 def _is_list_tokens(v):
+  """
+  This is a helper function.
+  It checks if `v` is a list of tokens. 
+  If so, we need to print differently.
+  """
     if isinstance(v, List):
         if len(v) > 0:
             if isinstance(v[0], Token):
@@ -174,11 +176,9 @@ def _is_list_tokens(v):
 
 
 class Printer(Component):
-    """A new component"""
-
+    
     @classmethod
     def required_components(cls) -> List[Type[Component]]:
-        """Specify which components need to be present in the pipeline."""
         return []
 
     defaults = {"alias": None}
@@ -229,17 +229,17 @@ Most of the code in this file is exactly the same as what you will find in
 [the documentation](https://rasa.com/docs/rasa/api/custom-nlu-components/).
 Let's observe a few things here. 
 
-0. We've created a `Printer` object that inherits from `rasa.nlu.components.Component`.
+1. We've created a `Printer` object that inherits from `rasa.nlu.components.Component`.
 1. This component does not depend on other components. You can confirm this by
 looking at the `required_components` method. If this component was a 
-`CountVectorizer` then it would depend on tokens and this method would be the
-place where you would specify that.
+`CountVectorizer` then it would depend on tokens being present and this method 
+would be the place where you would specify that.
 2. Right after this method we declare `defaults = {"alias": None}`. This sets
 the default value for the `alias` setting that we could set in the `config.yml`.
 3. Right after this statement we declare `language_list = None`. This means that 
 the component does not depend on a language. It's important to note that some 
-components won't work for certain language. For example, the `ConveRTFeaturizer`
-will only work for the english language.
+components only work for certain languages. For example, the `ConveRTFeaturizer`
+will only work for the English language.
 4. The `load`, `persist` and `train` methods are untouched and are also not relevant
 for this component. Since we're merely printing there's no need for a training
 phase or a phase where we load/store everything we've trained on disk.
@@ -258,10 +258,12 @@ def process(self, message: Message, **kwargs: Any) -> None:
             print(f"{k}: {v.__repr__()}")
 ```
 
-The `process` method of the `Component` object This is where all the components logic gets
+The `process` method of the `Component` object is where all the logic gets
 applied. In our case this is where all the printing happens. We can access all 
 the available data by parsing the `message` that the method receives. In particular, we peek
 inside of `message.data` and iterate over all the items. These all get printed. 
+
+## See the Effect 
 
 Let's train and run this. 
 
@@ -270,7 +272,7 @@ Let's train and run this.
 > rasa shell
 ```
 
-Now that we're in the shell we can talk to our system and observe what comes out. When 
+When you now talk to the assistant you'll see extra printed lines appear. When 
 we type `hello there` you should see the following messages being printed. 
 
 ### `printer.Printer` with alias `after tokenizer`
@@ -290,9 +292,7 @@ a token that summarises the entire sentence.
 ### `printer.Printer` with alias `after 1st cv`
 
 We now see that there are some sparse text features that 
-have been added. Note the size of the sparse matrix. We technically
-keep track of two tokens 
-
+have been added. 
 ```
 after 1st cv
 intent: {'name': None, 'confidence': 0.0}
@@ -301,6 +301,9 @@ tokens: ['hello', 'there', '__CLS__']
 text_sparse_features: <3x272 sparse matrix of type '<class 'numpy.int64'>'
         with 4 stored elements in COOrdinate format>
 ```
+
+Note the size of the sparse matrix. We keep track of features for three tokens,
+one of which is the `__CLS__` token.
 
 ### `printer.Printer` with alias `after 2nd cv`
 
@@ -350,5 +353,15 @@ text_sparse_features: <3x2605 sparse matrix of type '<class 'numpy.float64'>'
 intent_ranking: [{'name': 'greet', 'confidence': 0.9849509000778198}, {'name': 'talk_code', 'confidence': 0.008203224278986454}, {'name': 'goodbye', 'confidence': 0.005775876808911562}, {'name': 'bot_challenge', 'confidence': 0.0010700082639232278}]
 ```
 
+If you were now to utter `i want to talk about python` you should see 
+similar lines being printer but at the end you will now also see that
+entities have been detected.
+
 ## Conclusion 
+
+So what have we seen in this guide? 
+
+- We've seen how to create a custom component that can read in settings from `config.yml`. 
+- We've seen what features the component receives by looking at the output from the `printer.Printer`.
+- We've seen that the Rasa components continously add information to the message that is passed. 
 

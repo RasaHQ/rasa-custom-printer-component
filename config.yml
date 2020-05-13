@@ -20,6 +20,8 @@ pipeline:
   epochs: 20
 - name: printer.Printer
   alias: after diet classifier
+
+
 policies:
   - name: MemoizationPolicy
   - name: TEDPolicy
