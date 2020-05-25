@@ -15,9 +15,11 @@ that the pipeline has created. This will allow us to appreciate how
 components add features in the pipeline but it will also serve as a nice
 introduction on how to create custom components.
 
+Note that this tutorial was made with Rasa version 1.10.0 in mind.
+
 ## Example Project
 
-You can clone the repository found [here]() if you'd like to be able
+You can clone the repository found [here](https://github.com/RasaHQ/rasa-custom-printer-componen) if you'd like to be able
 to run the same project. The repository contains a relatively small 
 rasa project; we're only dealing with four intents and one entity. 
 Here's some of the files in the project:
